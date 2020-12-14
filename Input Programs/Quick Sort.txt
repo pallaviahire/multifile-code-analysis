@@ -1,0 +1,239 @@
+#include <stdio.h>
+#include <time.h>
+#include <math.h>
+#include<stdlib.h>
+#include<stdbool.h>
+#include<unistd.h>
+#include<math.h>
+
+int main() 
+{ 
+    double time_spent = 0.0;
+	clock_t begin = clock();
+	
+    int arr[] = {8,12,5,3,9,1,10,2,14,7};
+    int n = sizeof(arr)/sizeof(arr[0]); 
+    printf("QUICK SORT \n");
+    printf("Unsorted array \n");
+    for(int i=0; i<n; i++){
+        printf("%d ",arr[i]);
+    }
+    printf("\n");
+    quickSort(arr, 0, n-1); 
+    
+    printf("Sorted array \n");
+    for(int i=0; i<n; i++){
+        printf("%d ",arr[i]);
+    }
+    printf("\n");
+    
+    clock_t end = clock();
+	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Time elpased is %f seconds", time_spent);
+    return 0; 
+} 
+void swap(int* a, int* b) 
+{ 
+    int t = *a; 
+    *a = *b; 
+    *b = t; 
+} 
+int partition (int arr[], int low, int high) 
+{ 
+    int pivot = arr[high];    // pivot 
+    int i = (low - 1);  // Index of smaller element 
+  
+    for (int j = low; j <= high- 1; j++) 
+    { 
+        // If current element is smaller than the pivot 
+        if (arr[j] < pivot) 
+        { 
+            i++;    // increment index of smaller element 
+            swap(&arr[i], &arr[j]); 
+        } 
+    } 
+    swap(&arr[i + 1], &arr[high]); 
+    return (i + 1); 
+} 
+void quickSort(int arr[], int low, int high) 
+{ 
+     int p = getPrime();
+    sleep(1);
+    int q = getPrime();
+    int N = p * q;
+    int phi_N = (p-1)*(q-1);
+    int E = getPublicKey(N, phi_N);
+    int D = getPrivAteKey(E, phi_N);
+    
+    
+    if (low < high) 
+    { 
+        int pi = partition(arr, low, high); 
+        quickSort(arr, low, pi - 1); 
+        quickSort(arr, getSummation(pi,1,E,D,N), high); 
+    } 
+} 
+void printArray(int arr[], int size) 
+{ 
+    int i; 
+    for (i=0; i < size; i++) 
+        printf("%d ", arr[i]); 
+} 
+int getSummation(int a,int b,int E,int D,int N)
+{
+ 
+   
+    int plainValue_a = a;
+    int plainValue_b = b;
+    int cipher = getModValue(plainValue_a,E,N);
+    int decipher = getModValue(cipher, D, N);
+    a = decipher;
+    cipher = getModValue(plainValue_b, E, N);
+    decipher = getModValue(cipher, D, N);
+    b = decipher;
+    
+return (a+b);
+}
+
+int getDigit(int n)
+{
+return ((n>=10)?(n/10):0);
+}
+
+int getPrime(){
+    // printf("started\n");
+    time_t t;
+    srand((unsigned) time(&t));
+    int random_value;
+    int N = 10;
+    int arr[N];
+    
+    int i; 
+    int count = 0;
+    int pr = 5;
+
+    while(count < N)
+    {
+        bool flag = true; 
+    for(i=2; i<pr; i++){
+        if(pr%i == 0){
+            flag = false;
+            break;
+        }
+    }
+
+    if(flag){
+        arr[count++] = pr;
+       
+       
+    }
+   
+    pr++;
+
+    }
+    
+    unsigned long int randomgen = rand();
+    random_value = arr[randomgen%N];
+   
+    return random_value;
+}
+
+int gcd(int i, int j){
+    int rem = i % j;
+    while(rem != 0){
+        i = j;
+        j = rem;
+        rem = i%j;
+    }
+    return j;
+}
+
+int getPublicKey(int N, int phi_N){
+    int i;
+    int E;
+    for(i = 2; i<phi_N-1; i++){
+        int x = gcd(i,N);
+        int y = gcd(i,phi_N);
+
+        if(x == 1 && y == 1){
+            E = i;
+            break;
+        }
+    }
+    return E;
+}
+
+
+int getPrivAteKey( int e, int phi_n){
+    int rem = -1,T, NUM, m;
+    m = 0;
+    while(rem!=1){
+        m = m+1;
+        T = e*m;
+        rem = T % phi_n;
+    }
+    return m;
+}
+
+int getModValue(int base, int exp, int n)
+{
+
+    int bin=0,base_bin=1;
+    while(exp>0)
+    {
+        int rem=exp%2;
+        bin=bin+rem*base_bin;
+        exp=exp/2;
+        base_bin=base_bin*10;
+    }
+
+    int l=0;
+    int i;
+    int temp_num = bin;
+    while(temp_num>0)
+    {
+        temp_num=temp_num/10;
+        l++;
+    }
+
+    int x[l];
+    int p1=0;
+       
+    
+    while(bin>0)
+    {
+        int rem=bin%10;
+        x[p1++]=rem;
+        bin=bin/10;
+    }
+       
+    for (i = 0; i < l/2; i++)
+    {
+        int temp=x[i];
+        x[i]=x[(l-1)-(i)];
+        x[(l-1)-(i)] = temp;
+    }
+        
+    int d=base;
+    for (i = 1; i < l; i++) 
+    {
+        int v=x[i];
+        if(v==1)
+        {
+            int k=(d*d);
+            int g=k%n;
+            int p=(g*base) %n;
+            d=p;
+        } 
+        else 
+        {
+            int y=d*d;
+            d=y%n;
+        }
+                
+    }
+    
+    return d;
+    
+}
+
